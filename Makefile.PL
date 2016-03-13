@@ -9,17 +9,18 @@ $eumm_version =~ s/_//;
 
 WriteMakefile(
     NAME                => 'VirtDancer',
-    AUTHOR              => q{YOUR NAME <youremail@example.com>},
+    AUTHOR              => q{Moritz "LittleFox" Grosch <littlefox@cpan.org>},
     VERSION_FROM        => 'lib/VirtDancer.pm',
-    ABSTRACT            => 'YOUR APPLICATION ABSTRACT',
+    ABSTRACT            => 'Manage libvirt-based virtual machines with only a webbrowser or use the REST-API.',
     ($eumm_version >= 6.3001
       ? ('LICENSE'=> 'perl')
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
-        'YAML'       => 0,
-        'Dancer2'     => 0.166001,
+        'Test::More'                               => 0,
+        'YAML'                                     => 0,
+        'Dancer2'                                  => 0.166001,
+        'Dancer2::Plugin::Auth::HTTP::Basic::DWIW' => 0.0301,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'VirtDancer-*' },
