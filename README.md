@@ -3,6 +3,8 @@ Manage libvirt-based virtual machines in your webbrowser or using the integrated
 
 Webinterface using the REST-API implemented with AngularJS and Bootstrap included.
 
+Demo at https://rahja.lf-net.org/index.html
+
 ## Installation
 
 * Download VirtDancer
