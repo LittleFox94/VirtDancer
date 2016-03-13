@@ -9,10 +9,14 @@ Demo at https://rahja.lf-net.org/index.html
 
 * Download VirtDancer
 * edit config.yml
-* install dependencies from cpan: ```cpan Dancer2 Dancer2::Plugin::HTTP::Auth::Basic::DWIW Sys::Virt Sys::Statistics::Linux```
+* install dependencies from cpan: ```cpan Dancer2 Dancer2::Plugin::Auth::HTTP::Basic::DWIW Sys::Statistics::Linux Sys::Virt```
 * ```plackup bin/app.psgi``` in any way you want, look here for options: https://metacpan.org/pod/plackup
 
 ## Problems/Caveats
+
+### I can't install Sys::Virt from cpan
+
+Look for a version in your distributions package management.
 
 ### No virtual machines are listed
 
