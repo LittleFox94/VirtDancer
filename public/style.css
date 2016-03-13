@@ -1,0 +1,14 @@
+.panel-heading {
+    line-height: 2;
+}
+
+.panel-heading h3,
+.panel-heading .btn-group
+{
+    display:inline-block;
+}
+
+.navbar .running_status {
+    float: right;
+    display: inline-block;
+}
