@@ -59,4 +59,3 @@ Action can be:
 * pause -> suspend the VM
 * shutdown -> graceful shutdown of the VM (ACPI-shutdown signal)
 * destroy -> kill the VM (useful for windows-guests as these often ignore ACPI-shutdown -.-)
-```
