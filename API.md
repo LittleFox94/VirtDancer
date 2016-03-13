@@ -2,7 +2,7 @@
 
 VirtDancer is built from two parts: the backend exposing a REST-API and the frontend written in HTML/JS/CSS.
 
-Disclaimer: this may not be a true REST-API for java-coders as it always want's json but it works. Please
+_Disclaimer_: this may not be a true REST-API for java-coders as it always want's json but it works. Please
 don't annoy me to make this REST-API  level 9100 or something.
 
 ## Resources
