@@ -1,6 +1,10 @@
 package VirtDancer;
+use AnyEvent;
+use AnyEvent::Socket;
+use Data::Dumper;
 use Dancer2;
 use Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
+use IO::Handle;
 use Sys::Statistics::Linux;
 use Sys::Virt;
 use Time::HiRes qw(usleep);
@@ -13,9 +17,14 @@ sub VMM {
     Sys::Virt->new(uri => config->{libvirt_uri});
 }
 
-http_basic_auth_set_check_handler sub {
+sub authenticate {
     my ($user, $pass) = @_;
     return $user eq config->{admin_user} && $pass eq config->{admin_password};
+}
+
+http_basic_auth_set_check_handler sub {
+    my ($user, $pass) = @_;
+    authenticate($user, $pass);
 };
 
 get '/' => sub {
@@ -59,11 +68,11 @@ get '/vm/:uuid' => sub {
         uuid       => $domain->get_uuid_string,
         name       => $domain->get_name,
         active     => \$domain->is_active,
-        persistent => $domain->is_persistent,
-        updated    => $domain->is_updated,
+        persistent => \$domain->is_persistent,
+        updated    => \$domain->is_updated,
         os         => $domain->get_os_type,
         info       => $domain->get_info,
-        autostart  => $domain->get_autostart,
+        autostart  => \$domain->get_autostart,
     };
 };
 

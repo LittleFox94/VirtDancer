@@ -40,6 +40,7 @@
                             <span ng-class="{ 'glyphicon-play': virtdancer.active_vm.active, 'glyphicon-stop': !virtdancer.active_vm.active }" class="glyphicon"></span>
                             <h3 class="panel-title">{{virtdancer.active_vm.name}}</h3>
                             <div class="pull-right">
+                                <button ng-click="virtdancer.vnc()" ng-show="virtdancer.active_vm.active" type="button" class="btn btn-sm btn-info" ><span class="glyphicon glyphicon-console"></span></button>
                                 <button ng-click="virtdancer.action('start')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-play"></span></button>
                                 <button ng-click="virtdancer.action('pause')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pause"></span></button>
                                 <button ng-click="virtdancer.action('shutdown')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-stop"></span></button>
@@ -49,6 +50,9 @@
                         <div class="panel-body">
                             <span class="vm_info"><b>ID:</b> {{virtdancer.active_vm.id}} <b>UUID:</b> {{virtdancer.active_vm.uuid}}</span>
                         </div>
+                    </div>
+                    <div id="vnc" class="panel panel-default" ng-show="virtdancer.vnc_uuid">
+                        <canvas id="vnc_target">Your browser does not support HTML5 canvas :(</canvas>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html ng-app="VirtDancer">
+    <head>
+        <title>VirtDancer</title>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://bootswatch.com/superhero/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css" type="text/css">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        <script src="noVNC/include/util.js"></script>
+    </head>
+    <body onload="init()">
+        <div class="container-fluid">
+            <div class="row">
+                <div id="header" class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <a href="index.html" class="navbar-brand"><span class="glyphicon glyphicon-chevron-left"></span>VirtDancer</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title" id="vm_name"></h3>
+                            <div class="pull-right">
+                                <button onclick="window.rfb.sendCtrlAltDel()" class="btn btn-sm btn-primary">Ctrl-Alt-Del</button>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="text-align: center;">
+                            <canvas id="vnc"></canvas>
+                        </div>
+                        <div class="panel-footer">
+                            <b>Status: </b><span id="rfb_state"></span>
+                            <span class="pull-right">
+                                Powered by <a href="https://kanaka.github.io/noVNC/">noVNC</a>!
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            "use strict";
+            var INCLUDE_URI = "noVNC/include/";
+            
+            Util.load_scripts(["webutil.js", "base64.js", "websock.js", "des.js", "keysymdef.js",
+                               "keyboard.js", "input.js", "display.js", "inflator.js", "rfb.js",
+                               "keysym.js"]);
+
+            var getUrlParameter = function getUrlParameter(sParam) {
+                var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                    sURLVariables = sPageURL.split('&'),
+                    sParameterName,
+                    i;
+
+                for (i = 0; i < sURLVariables.length; i++) {
+                    sParameterName = sURLVariables[i].split('=');
+
+                    if (sParameterName[0] === sParam) {
+                        return sParameterName[1] === undefined ? true : sParameterName[1];
+                    }
+                }
+            }
+
+            function init_vmdata(e) {
+                window.vmdata = JSON.parse(e.currentTarget.responseText);
+                document.getElementById('vm_name').innerText = window.vmdata.name;
+            }
+
+            function init() {
+                var xhr = new XMLHttpRequest();
+                xhr.addEventListener('load', init_vmdata);
+                xhr.open('GET', 'vm/' + getUrlParameter('uuid'), true);
+                xhr.send();
+
+                window.rfb = new RFB({
+                    "target": document.getElementById('vnc'),
+                    "encrypt": (window.location.protocol === "https:"),
+                    "true_color": true,
+                    "local_cursor": true,
+                    "shared": true,
+                    "view_only": false,
+                    "onUpdateState": function(instance, state, oldState, message) {
+                        document.getElementById('rfb_state').innerText = message;
+                    }
+                });
+
+                var port = window.location.protocol === "https:" ? 443 : 80;
+
+                if(window.location.port) {
+                    port = window.location.port;
+                }
+
+                window.rfb.connect(window.location.hostname, port, "", "vnc/" + getUrlParameter('uuid'));
+            }
+        </script>
+    </body>
+</html>

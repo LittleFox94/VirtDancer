@@ -17,6 +17,7 @@
 
         this.resetApp = function() {
             this.active_vm = null;
+            this.vnc_uuid = null;
             this.num_running = 0;
             this.vms = [];
             this.updateData();
@@ -30,6 +31,12 @@
             $http.post('/vm/' + this.active_vm.uuid + '/action', {"action": action }).error(function (error) {
                 console.log(error);
             });
+        };
+
+        this.vnc = function() {
+            if(this.active_vm !== null) {
+                window.location.href = "vnc.html?uuid=" + this.active_vm.uuid;
+            }
         };
 
         this.resetApp();
