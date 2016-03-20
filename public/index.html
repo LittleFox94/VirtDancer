@@ -1,58 +1,99 @@
 <!DOCTYPE html>
 <html ng-app="VirtDancer">
-    <head>
-        <title>VirtDancer</title>
-        <meta http-equiv="content-type" content="text/html;charset=utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://bootswatch.com/superhero/bootstrap.min.css">
-        <link rel="stylesheet" href="style.css" type="text/css">
+  <head>
+    <title>VirtDancer</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css" type="text/css">
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="angular.min.js"></script>
-        <script type="text/javascript" src="app.js"></script>
-    </head>
-    <body ng-controller="VirtDancerController as virtdancer">
-        <div class="container-fluid">
-            <div class="row">
-                <div id="header" class="navbar navbar-default">
-                    <div class="container-fluid">
-                        <a class="navbar-brand" ng-click="virtdancer.resetApp()" href="">VirtDancer</a>
-                        <span class="navbar-brand running_status">
-                            {{virtdancer.num_running}}/{{virtdancer.vms.length}} running
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
-                    <div id="vm_list" class="list-group">
-                        <button ng-click="virtdancer.active_vm = vm" ng-repeat="vm in virtdancer.vms | orderBy:['-active', 'name']" class="list-group-item" ng-class="{ active:virtdancer.active_vm === vm }">
-                            <span ng-class="{ 'glyphicon-play': vm.active, 'glyphicon-stop': !vm.active }" class="glyphicon"></span>
-                            <span>{{vm.name}}</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
-                    <div id="detail" class="panel panel-default" ng-show="virtdancer.active_vm">
-                        <div class="panel-heading">
-                            <span ng-class="{ 'glyphicon-play': virtdancer.active_vm.active, 'glyphicon-stop': !virtdancer.active_vm.active }" class="glyphicon"></span>
-                            <h3 class="panel-title">{{virtdancer.active_vm.name}}</h3>
-                            <div class="pull-right">
-                                <button ng-click="virtdancer.vnc()" ng-show="virtdancer.active_vm.active" type="button" class="btn btn-sm btn-info" ><span class="glyphicon glyphicon-console"></span></button>
-                                <button ng-click="virtdancer.action('start')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-play"></span></button>
-                                <button ng-click="virtdancer.action('pause')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pause"></span></button>
-                                <button ng-click="virtdancer.action('shutdown')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-stop"></span></button>
-                                <button class="btn btn-sm btn-danger" ng-click="virtdancer.action('destroy')"><span class="glyphicon glyphicon-off"></span></button>
-                            </div>
-                        </div>
-                        <div class="panel-body">
-                            <span class="vm_info"><b>ID:</b> {{virtdancer.active_vm.id}} <b>UUID:</b> {{virtdancer.active_vm.uuid}}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="angular.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+  </head>
+  <body ng-controller="VirtDancerController as virtdancer">
+    <div class="container-fluid">
+      <div class="row">
+        <div id="header" class="navbar navbar-default">
+          <div class="container-fluid">
+            <a class="navbar-brand" ng-click="virtdancer.resetApp()" href="">VirtDancer</a>
+            <span class="navbar-brand running_status">
+              {{virtdancer.num_running}}/{{virtdancer.vms.length}} running
+            </span>
+          </div>
         </div>
-    </body>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+          <div id="vm_list" class="list-group">
+            <button ng-click="virtdancer.active_vm = vm" ng-repeat="vm in virtdancer.vms | orderBy:['-active', 'name']" class="list-group-item" ng-class="{ active:virtdancer.active_vm === vm }">
+              <span ng-class="{ 'glyphicon-play': vm.active, 'glyphicon-stop': !vm.active }" class="glyphicon"></span>
+              <span>{{vm.name}}</span>
+            </button>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
+          <div id="detail" class="panel panel-default" ng-show="virtdancer.active_vm">
+            <div class="panel-heading">
+              <span ng-class="{ 'glyphicon-play': virtdancer.active_vm.active, 'glyphicon-stop': !virtdancer.active_vm.active }" class="glyphicon"></span>
+              <h3 class="panel-title">{{virtdancer.active_vm.name}}</h3>
+              <div class="pull-right">
+                <button ng-click="virtdancer.vnc()" ng-show="virtdancer.active_vm.active" type="button" class="btn btn-sm btn-info" ><span class="glyphicon glyphicon-console"></span></button>
+                <button ng-click="virtdancer.action('start')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-play"></span></button>
+                <button ng-click="virtdancer.action('pause')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pause"></span></button>
+                <button ng-click="virtdancer.action('shutdown')" type="button" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-stop"></span></button>
+                <button class="btn btn-sm btn-danger" ng-click="virtdancer.action('destroy')"><span class="glyphicon glyphicon-off"></span></button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <span class="vm_info"><b>ID:</b> {{virtdancer.active_vm.id}} <b>UUID:</b> {{virtdancer.active_vm.uuid}}</span>
+              <div id="vm_detail_info">
+                <table class="table table-striped table-condensed table-bordered">
+                  <tr>
+                    <td>Name</td>
+                    <td>{{virtdancer.active_vm.name}}</td>
+                  </tr>
+                  <tr>
+                    <td>Active</td>
+                    <td>{{virtdancer.active_vm.active ? 'yes' : 'no'}}</td>
+                  </tr>
+                  <tr>
+                    <td>Persistent</td>
+                    <td>{{virtdancer.active_vm.persistent ? 'yes' : 'no'}}</td>
+                  </tr>
+                  <tr>
+                    <td>Config changed</td>
+                    <td>{{virtdancer.active_vm.updated ? 'yes' : 'no'}}</td>
+                  </tr>
+                  <tr>
+                    <td>Autostart</td>
+                    <td>{{virtdancer.active_vm.autostart ? 'yes' : 'no'}}</td>
+                  </tr>
+                </table>
+                <table class="table table-striped table-condensed table-bordered">
+                  <tr>
+                    <td>CPU count</td>
+                    <td>{{virtdancer.active_vm.info.nrVirtCpu}}</td>
+                  </tr>
+                  <tr>
+                    <td>Current memory</td>
+                    <td>{{virtdancer.active_vm.info.memory * 1024 | bytes}}</td>
+                  </tr>
+                  <tr>
+                    <td>Max memory</td>
+                    <td>{{virtdancer.active_vm.info.maxMem * 1024 | bytes}}</td>
+                  </tr>
+                  <tr>
+                    <td>CPU time</td>
+                    <td>{{virtdancer.active_vm.info.cpuTime | nsDuration}}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

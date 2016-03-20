@@ -12,3 +12,19 @@
     float: right;
     display: inline-block;
 }
+
+#vm_detail_info {
+    margin-top: 10px;
+}
+
+#vm_detail_info table {
+    margin-bottom: 10px;
+    width: auto;
+    min-width: 20%;
+    float: left;
+    margin-left: 10px;
+}
+
+#vm_detail_info tr td:first-child {
+    width: 120px;
+}
