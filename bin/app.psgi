@@ -24,7 +24,7 @@ my $wsserver = AnyEvent::WebSocket::Server->new(
 
 builder {
     mount '/vnc' => builder {
-        enable "Auth::Basic", authenticator => \&VirtDancer::authenticate;
+        enable "Auth::Basic", authenticator => \&VirtDancer::authenticate, realm => 'Please login';
         Plack::App::WebSocket->new(
             websocket_server => $wsserver,
             on_error         => sub {
