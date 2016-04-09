@@ -9,7 +9,7 @@ Demo at https://rahja.lf-net.org/index.html
 
 * Download VirtDancer
 * edit config.yml
-* install dependencies from cpan: ```cpan Dancer2 Dancer2::Plugin::Auth::HTTP::Basic::DWIW Sys::Statistics::Linux Sys::Virt```
+* install dependencies from cpan: ```cpan Dancer2 Dancer2::Plugin::Auth::HTTP::Basic::DWIW Sys::Statistics::Linux Plack::App::WebSocket Sys::Virt```
 * choose a server: Twiggy or Corona (or any other compatible with Plack::App::WebSocket) and install it with cpan, I'm using Twiggy
 * ```twiggy bin/app.psgi``` with any other parameters you want, look here for options: https://metacpan.org/pod/plackup
 
