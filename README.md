@@ -7,8 +7,8 @@ Demo at https://rahja.lf-net.org/index.html
 
 ## Installation
 
-* Download VirtDancer
-* edit config.yml
+* Download VirtDancer (don't forget the submodule for noVNC!)
+* edit config.yml, for the password you can use the supplied ```hash_password``` command
 * install dependencies from cpan: ```cpan Dancer2 Dancer2::Plugin::Auth::HTTP::Basic::DWIW Sys::Statistics::Linux Plack::App::WebSocket Sys::Virt```
 * choose a server: Twiggy or Corona (or any other compatible with Plack::App::WebSocket) and install it with cpan, I'm using Twiggy
 * ```twiggy bin/app.psgi``` with any other parameters you want, look here for options: https://metacpan.org/pod/plackup
@@ -25,13 +25,6 @@ Can VirtDancer access the libvirt-socket?
 
 You shouldn't run VirtDancer as root but as it's own user. That user needs access to libvirts Unix-Socket, i.e. on debian you
 have to ```adduser virtdancer libvirt``` (given the user is virtdancer).
-
-### Anonymous users can see anything
-
-Yes, all people can see everything. But only users with the admin-credentials can do actions (such as starting or stopping virtual machines).
-
-I've written this software for my server where this was wanted, I'm open to pull-requests, but given the architecture of
-Dancer2::Plugin::Auth::HTTP::Basic::DWIW, there may not be another way yet. I'm open to pull requests there, too ;)
 
 ### The code is bad and you should feel bad!
 
