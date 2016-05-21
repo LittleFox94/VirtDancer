@@ -1,7 +1,7 @@
 package VirtDancer;
 use AnyEvent;
 use AnyEvent::Socket;
-use Data::Dumper;
+use List::Util qw(any);
 use Dancer2;
 use Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
 use IO::Handle;
@@ -11,7 +11,7 @@ use Time::HiRes qw(usleep);
 
 set serializer => 'JSON';
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub VMM {
     Sys::Virt->new(uri => config->{libvirt_uri});
@@ -19,7 +19,40 @@ sub VMM {
 
 sub authenticate {
     my ($user, $pass) = @_;
-    return $user eq config->{admin_user} && $pass eq config->{admin_password};
+
+    my $userconfig = config->{users};
+
+    if(!exists($userconfig->{$user})) {
+        return 0;
+    }
+
+    my $hash = $userconfig->{$user}->{password};
+
+    return (crypt($pass, $hash) eq $hash);
+}
+
+sub check_vm_access_by_name {
+    my ($user, $vm_name) = @_;
+
+    if(!exists(config->{users}->{$user})) {
+        return 0;
+    }
+
+    my $filters = config->{users}->{$user}->{filters};
+
+    if(any { $_ eq $vm_name } @{$filters->{exact}}) {
+        return 1;
+    }
+
+    if(any { $vm_name =~ m/^\Q$_/ } @{$filters->{prefix}}) {
+        return 1;
+    }
+
+    if(any { $vm_name =~ m/\Q$_$/ } @{$filters->{suffix}}) {
+        return 1;
+    }
+
+    return 0;
 }
 
 http_basic_auth_set_check_handler sub {
@@ -46,22 +79,30 @@ get '/stats/cpu' => sub {
 get '/stats/mem' => sub {
 };
 
-get '/vm' => sub {
+get '/vm' => http_basic_auth required => sub {
+    my ($user)  = http_basic_auth_login;
     my @domains = VMM->list_all_domains();
   
     return [
         map {
-            {
-                uuid   => $_->get_uuid_string,
-                name   => $_->get_name,
-                active => \$_->is_active,
-            }
+            check_vm_access_by_name($user, $_->get_name) ?
+                {
+                    uuid   => $_->get_uuid_string,
+                    name   => $_->get_name,
+                    active => \$_->is_active,
+                }
+            : ()
         } @domains,
     ];
 };
 
-get '/vm/:uuid' => sub {
+get '/vm/:uuid' => http_basic_auth required => sub {
+    my ($user) = http_basic_auth_login;
     my $domain = VMM->get_domain_by_uuid(params->{uuid});
+
+    unless(check_vm_access_by_name($user, $domain->get_name)) {
+        send_error("Access denied", 403);
+    }
 
     return {
         id         => $domain->get_id,

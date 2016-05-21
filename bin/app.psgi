@@ -7,8 +7,8 @@ use lib "$FindBin::Bin/../lib";
 
 use AnyEvent;
 use AnyEvent::WebSocket::Server;
-use Data::Dumper;
 use File::Basename ('basename');
+use MIME::Base64;
 use Plack::Builder;
 use Plack::App::WebSocket;
 use Sys::Virt;
@@ -37,8 +37,18 @@ builder {
                 my $conn = shift;
                 my $env  = shift;
 
+                my ($auth_method, $auth_string) = split(' ', $env->{HTTP_AUTHORIZATION});
+                my ($username)                  = split(':', decode_base64($auth_string));
+
                 my $uuid   = basename($env->{REQUEST_URI});
                 my $domain = VirtDancer::VMM->get_domain_by_uuid($uuid);
+
+                unless(VirtDancer::check_vm_access_by_name($username, $domain->get_name)) {
+                    die $username;
+                    $conn->close();
+                    return;
+                }
+
                 my $fd     = $domain->open_graphics_fd(0, 0);
                 open(my $fh, "+<&=$fd");
 
