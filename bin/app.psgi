@@ -48,17 +48,19 @@ builder {
                         my ($self) = @_;
                         my $strong_connection = $conn;
 
-                        my $message = AnyEvent::WebSocket::Message->new(
-                            body   => $self->rbuf,
-                            opcode => 2,
-                        );
+                        my $buffer = $self->rbuf;
 
-                        $conn->send($message);
-                        $self->rbuf() = '';
+                        while($buffer) {
+                            my $message = AnyEvent::WebSocket::Message->new(
+                                body   => substr($buffer, 0, 65535, ''),
+                                opcode => 2,
+                            );
+
+                            $conn->send($message);
+                            $self->rbuf() = $buffer;
+                        }
                     },
                     on_error => sub {
-                        my ($self, $fatal, $message) = @_;
-                        print STDERR $message;
                     },
                 );
 
