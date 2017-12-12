@@ -71,8 +71,12 @@ get '/stats/cpu' => sub {
     my $cpu  = $stat->cpustats->{cpu};
 
     return {
-        usr => $cpu->{user},
-        sys => $cpu->{system},
+        usr    => $cpu->{user},
+        sys    => $cpu->{system},
+        steal  => $cpu->{steal},
+        iowait => $cpu->{iowait},
+        irq    => $cpu->{irq},
+        total  => $cpu->{total},
     };
 };
 
