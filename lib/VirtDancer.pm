@@ -77,12 +77,101 @@ get '/stats/cpu' => sub {
 };
 
 get '/stats/mem' => sub {
+    open(my $fh, '<', '/proc/meminfo');
+
+    my $mem_total;
+    my $mem_free;
+    my $mem_buffer;
+    my $swap_total;
+    my $swap_free;
+
+    while(my $line = <$fh>) {
+        if(my ($name, $value) = $line =~ m/([[:alpha:]]+):\s+(\d+) kB/) {
+            $value *= 1024;
+
+            if($name eq 'MemTotal') {
+                $mem_total = $value;
+            }
+            elsif($name eq 'MemFree') {
+                $mem_free = $value;
+            }
+            elsif($name eq 'Buffers') {
+                $mem_buffer = $value;
+            }
+            elsif($name eq 'SwapTotal') {
+                $swap_total = $value;
+            }
+            elsif($name eq 'SwapFree') {
+                $swap_free = $value;
+            }
+        }
+    }
+
+    close($fh);
+    return {
+        memTotal  => $mem_total,
+        memFree   => $mem_free,
+        memBuffer => $mem_buffer,
+        swapTotal => $swap_total,
+        swapFree  => $swap_free,
+    }
+};
+
+get '/stats/nic' => sub {
+    my $filter = param('filter') // '';
+
+    opendir(my $dir, '/sys/class/net') or send_error 'Not found', 404;
+
+    my $ret = {};
+
+    while(my $interface = readdir $dir) {
+        next if($filter eq 'physical' && !-e "/sys/class/net/$interface/device");
+
+        next if($interface eq '.' || $interface eq '..');
+        next unless(-d "/sys/class/net/$interface");
+
+        open(my $fh, '<', '/sys/class/net/' . $interface . '/statistics/tx_bytes');
+        my $tx = <$fh>;
+        close $fh;
+
+        open($fh, '<', '/sys/class/net/' . $interface . '/statistics/rx_bytes');
+        my $rx = <$fh>;
+        close $fh;
+
+        $ret->{$interface . '_rx'} = $rx;
+        $ret->{$interface . '_tx'} = $tx;
+    }
+
+    closedir($dir);
+
+    return $ret;
+};
+
+get '/stats/nic/:name' => sub {
+    my $nic = param('name');
+
+    if($nic =~ m/(\/|\.\.)/) {
+        send_error 'Not found', 404;
+    }
+
+    open(my $fh, '<', '/sys/class/net/' . $nic . '/statistics/tx_bytes');
+    my $tx = <$fh>;
+    close $fh;
+
+    open($fh, '<', '/sys/class/net/' . $nic . '/statistics/rx_bytes');
+    my $rx = <$fh>;
+    close $fh;
+
+    return {
+        tx => $tx,
+        rx => $rx,
+    };
 };
 
 get '/vm' => http_basic_auth required => sub {
     my ($user)  = http_basic_auth_login;
     my @domains = VMM->list_all_domains();
-  
+
     return [
         map {
             check_vm_access_by_name($user, $_->get_name) ?
@@ -115,6 +204,28 @@ get '/vm/:uuid' => http_basic_auth required => sub {
         info       => $domain->get_info,
         autostart  => \$domain->get_autostart,
     };
+};
+
+get '/vm/:uuid/stats/cpu' => http_basic_auth required => sub {
+    my ($user) = http_basic_auth_login;
+    my $domain = VMM->get_domain_by_uuid(params->{uuid});
+
+    unless(check_vm_access_by_name($user, $domain->get_name)) {
+        send_error('Access denied', 403);
+    }
+
+    my @cpus_old = $domain->get_vcpu_info;
+    my $ns_sleep = usleep(250000) * 1000;
+    my @cpus_new = $domain->get_vcpu_info;
+
+    my %values;
+
+    # XXX: are there hotplug CPUs?
+    for(my $i = 0; $i < @cpus_old; ++$i) {
+        $values{"cpu_$i"} = 0+sprintf("%0.2f", ($cpus_new[$i]->{cpuTime} - $cpus_old[$i]->{cpuTime}) / $ns_sleep * 100);
+    }
+
+    return \%values;
 };
 
 post '/vm/:uuid/action' => http_basic_auth required => sub {
