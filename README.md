@@ -3,6 +3,12 @@ Manage libvirt-based virtual machines in your webbrowser or using the integrated
 
 Webinterface using the REST-API implemented with AngularJS and Bootstrap included.
 
+## GUI
+
+There is a new UI in work in a separate project on github and my gitlab:
+* https://github.com/LittleFox94/VirtDancer-GUI
+* https://praios.lf-net.org/littlefox/virtdancer-ui
+
 ## Installation
 
 * Download VirtDancer (don't forget the submodule for noVNC!)
